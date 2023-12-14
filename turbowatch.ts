@@ -1,6 +1,7 @@
 import chalk from 'chalk'; // Import the chalk library
 import { config } from 'dotenv';
 import { watch } from 'turbowatch';
+import { exec } from 'child_process';
 
 config({ path: 'packages/backend/.env' });
 
@@ -24,21 +25,28 @@ packages.forEach((packageName) => {
           console.log(
             chalk.yellow.bold(
               '👀 Detected changes in pieces. Building... 👀 ' +
-                piecePackageName
+              piecePackageName
             )
           );
-          if (first) {
-            await spawn`nx run-many -t build --projects=${piecePackageName} --skip-nx-cache`;
-            return;
-          }
-          await spawn`nx run-many -t build --projects=${piecePackageName} --skip-nx-cache`;
+          // await spawn`nx run-many -t build --projects=${piecePackageName} --skip-nx-cache`;
+          exec(`nx run-many -t build --projects=${piecePackageName} --skip-nx-cache`, (error, stdout, stderr) => {
+            if (error) {
+              console.log(`error: ${error.message}`);
+              return;
+            }
+            if (stderr) {
+              console.log(`stderr: ${stderr}`);
+              return;
+            }
+            console.log(`stdout: ${stdout}`);
+            // Print a fancy message to the console using chalk
+            console.log(
+              chalk.green.bold(
+                '✨ Changes are ready! Please refresh the frontend to see the new updates. ✨'
+              )
+            );
+          });
 
-          // Print a fancy message to the console using chalk
-          console.log(
-            chalk.green.bold(
-              '✨ Changes are ready! Please refresh the frontend to see the new updates. ✨'
-            )
-          );
         },
       },
     ],

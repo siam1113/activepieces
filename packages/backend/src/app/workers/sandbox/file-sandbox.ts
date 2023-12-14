@@ -34,10 +34,9 @@ export class FileSandbox extends AbstractSandbox {
         const command = [
             `cd ${this.getSandboxFolderPath()}`,
             '&&',
-            `env -i AP_PIECES_SOURCE=${pieceSources} NODE_OPTIONS='--enable-source-maps'`,
-            AbstractSandbox.nodeExecutablePath,
-            'main.js',
-            operation,
+            `setx AP_PIECES_SOURCE ${pieceSources} && setx NODE_OPTIONS '--enable-source-maps'`,
+            '&&',
+            `"${AbstractSandbox.nodeExecutablePath}" main.js ${operation}`,
         ].join(' ')
 
         const result = await this.runUnsafeCommand(command)
